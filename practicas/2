@@ -1,0 +1,82 @@
+const :: a -> b -> a
+const x y = x
+
+const :: a -> b -> a
+const x = \y  -> x
+
+flip :: (a -> b -> c) -> b -> a -> c
+flip f x y = f y x
+
+flip :: (a -> b -> c) -> b -> a -> c
+flip f = \x -> \y -> f y x
+
+uncurry :: (a -> b -> c) -> (a,b) -> c
+uncurry f (x,y) = f x y
+
+uncurry :: :: (a -> b -> c) -> (a,b) -> c
+uncurry f = \(x,y) -> f x y
+
+curry :: ((a,b) -> c) -> a -> b -> c
+curry f x y = f(x,y)
+
+type Set a = a -> Bool
+
+belongs :: Eq a => Set a -> a -> Bool
+belongs s x = s x
+
+singleton :: Eq a => a -> Set a
+singleton x = \y -> x == y
+
+singleton :: Eq a => a -> Set a
+singleton x y = x == y
+
+singleton :: Eq a => a -> Set a
+singleton x = (x==)
+
+singleton :: Eq a => a -> Set a
+singleton = (==)
+
+empty :: Set a
+empty = \_ -> False
+
+universal :: Set a
+universal = const True
+
+complement :: Set a -> Set a
+complement s = \x -> not (s x)
+
+complement :: Set a -> Set a
+complement s x = not . s
+
+union :: Set a -> Set a -> Set a
+union s q = \x -> s x || q x
+
+intersect :: Set a -> Set a -> Set a
+intersect s q = \x -> s x && q x
+
+cartesian :: Set a -> Set b -> Set (a,b)
+cartesian s q = \(x,y) -> s x && q y
+
+listToSet :: Eq a => [a] -> Set a
+listToSet xs = \x -> elem x xs
+
+listToSet :: Eq a => [a] -> Set a
+listToSet = flip elem
+
+gtPairs :: Ord a => Set (a,a)
+gtPairs = \(x,y) -> x < y
+
+gtPairs :: Ord a => Set (a,a)
+gtPairs = \(x,y) -> (<) x y
+
+gtPairs :: Ord a => Set (a,a)
+gtPairs = uncurry (<)
+
+image :: Set (a, b) -> a -> Set b
+image s x = \y -> s (x,y)
+
+image :: Set (a, b) -> a -> Set b
+image s x y = s (x,y)
+
+image :: Set (a, b) -> a -> Set b
+image = curry
