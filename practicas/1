@@ -1,0 +1,61 @@
+data Maybe a = Nothing | Just a
+
+
+isNothing :: Maybe a -> Bool
+isNothing Nothing  = True
+isNothing (Just x) = False
+
+id :: a -> a
+id x = x
+
+id' = \y -> y
+
+apply :: (a -> b) -> a -> b
+apply f x = f x
+
+apply id 3 => 3
+
+($) :: (a -> b) -> a -> b
+($) f x = f x
+
+maybeApply :: (a -> Maybe b) -> Maybe a -> Maybe b
+maybeApply f Nothing = Nothing
+maybeApply f (Just x) = f x
+
+liftMaybe :: a -> Maybe a
+liftMaybe x = Just x
+
+liftMaybe :: a -> Maybe a
+liftMaybe = \x -> Just x
+
+liftMaybe :: a -> Maybe a
+liftMaybe = Just
+
+data Nat = Zero | Suc Nat
+
+inc :: Nat -> Nat
+inc x = Suc x
+
+inc :: Nat -> Nat
+inc = Suc
+
+const :: a -> b -> a
+const x y = x
+
+const x = \y -> x
+
+const = \x -> \y -> x
+
+const = \x y -> x
+
+let f = const 3
+in f True
+
+(.) :: (a -> b) -> (c -> a) -> (c -> b)
+(.) f g = \x -> f(g x)
+
+(.) :: (a -> b) -> (c -> a) -> (c -> b)
+(.) f =\g -> \x -> f(g x)
+
+(.) :: (a -> b) -> (c -> a) -> (c -> b)
+(.) f g x = f (g x)
