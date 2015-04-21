@@ -51,11 +51,33 @@ const = \x y -> x
 let f = const 3
 in f True
 
-(.) :: (a -> b) -> (c -> a) -> (c -> b)
+(.) :: (a -> b) -> (c -> a) -> c -> b
 (.) f g = \x -> f(g x)
 
-(.) :: (a -> b) -> (c -> a) -> (c -> b)
+(.) :: (a -> b) -> (c -> a) -> c -> b
 (.) f =\g -> \x -> f(g x)
 
-(.) :: (a -> b) -> (c -> a) -> (c -> b)
+(.) :: (a -> b) -> (c -> a) -> c -> b
 (.) f g x = f (g x)
+
+twice :: (a -> a) -> a -> a
+twice f = f.f
+
+pred :: Nat -> Maybe Nat
+pred Zero = Nothing
+pred (Suc n) = Just n
+
+pred3 :: Nat -> Maybe Nat
+pred3 n = let p1 = pred n
+			  p2 = maybeApply pred p1
+			  p3 = maybeApply pred p2
+		  in p3
+
+maybePred :: Maybe Nat -> Maybe Nat
+maybePred = maybeApply pred
+
+maybePred3 :: Maybe Nat -> Maybe Nat
+maybePred3 = (twice maybePred).maybePred
+
+pred3 :: Nat -> Maybe Nat
+pred = maybePred3.liftMaybe

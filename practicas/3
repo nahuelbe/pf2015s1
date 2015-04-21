@@ -1,0 +1,147 @@
+type FuzzySet a = a -> Float
+
+fuzzySingleton :: Eq a => a -> Float -> Fuzzy Set a
+fuzzySingleton x f y = f x == y then p else 0.0
+
+fuzzyBelongs :: FuzzySet a -> a -> Float
+fuzzyBelongs = ($)
+
+union :: FuzzySet a -> FuzzySet a -> FuzzySet a
+union f g x = max (f x) (g x)
+
+intersect :: FuzzySet a -> FuzzySet a -> FuzzySet a
+intersect f g x = min (f x) (g x)
+
+complement :: FuzzySet a -> FuzzySet a
+complement s = \x -> 1.0 - (s x)
+
+TP3 escribir el tipo de fix
+
+fix :: ((b -> a) -> b -> a) -> b -> a
+fix f x = f (fix f) x
+             _____
+       aplicación parcial  
+
+---------------------------------------------------------------------------------
+
+DEMOSTRACIONES!
+
+data Nat = Zero | Suc Nat
+
+add :: Nat -> Nat -> Nat
+add n Zero = n
+add n (Suc m) = add (Suc n) m
+
+sub :: Nat -> Nat -> Nat
+sub n Zero = n
+sub (Suc n) (Suc m) = sub n m
+
+mul :: Nat -> Nat -> Nat
+mul _ Zero = Zero
+mul n (suc m) = add n (mul n m)
+
+\x -> x 'mul' (Suc Zero) == \x -> x :: Nat -> Nat
+
+por principio de extensionalidad.
+
+si para todo y
+
+(\x -> x 'mul' (Suc Zero)) y == (\x -> x) y
+
+HAY QUE REDUCIR
+
+por beta-reducción
+
+B (beta) =>  y 'mul' (Suc Zero) = y
+
+aplico las reglas de 'mul'
+
+por la regla 2 de mul 
+
+add y (mul y Zero) == y
+
+por la regla 1 de mul
+
+add y (Zero) == y
+
+por la regla 1 de add
+
+y == y
+
+---------------------------------------------------------------------
+
+(\x -> (x 'add' Suc Zero) 'sub' Suc Zero) = \x -> x 'add' Zero
+
+Por principio de extensionalidad
+
+Para todo x
+
+(\x -> (x 'add' Suc Zero) 'sub' Suc Zero) x == (\x -> x 'add' Zero) x
+
+por beta-reducción
+
+B (beta) => (x 'add' Suc Zero) 'sub' Suc Zero == x 'add' Zero
+
+por la regla 2 del add
+
+(suc x 'add' Zero) 'sub' Suc Zero == x 'add' Zero
+
+por la regla 1 del add
+
+Suc x 'sub' Suc Zero == x
+
+por la regla 2 de sub
+
+x 'sub' Zero == x
+
+por la regla 1 de sub
+
+x == x
+
+------------------------------------------------------------------------------
+
+qvq. curry (uncurry f) == f
+
+por principio de extensionalidad
+
+para todo x
+
+curry (uncurry f) x == f x
+
+para todo y
+
+curry (uncurry f) x y == f x y
+
+por la definición de curry
+
+(uncurry f) (x,y) == f x y
+
+por la definición de uncurry
+
+f x y == f x y
+
+-----------------------------------------------------------------------------
+
+qvq. flip(curry f) == curry (f . swap)
+
+por principio de extensionalidad
+
+para todo X, para todo Y
+
+flip (curry f) x y == curry (f . swap) x y
+
+por definición de flip
+
+(curry f) y x == curry (f . swap) x y
+
+por definición de curry
+
+f (y, x) == (f.swap) (x,y)
+
+por definición de la composición (.)
+
+f(y,x) == f (swap (x,y))
+
+por definición de swap
+
+f(y,x) == f(y,x)
