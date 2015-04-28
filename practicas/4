@@ -1,0 +1,227 @@
+data Nat = Zero | Suc Nat
+
+even :: Nat -> Bool
+even Zero = True
+even (Suc n) = odd n
+
+odd :: Nat -> Bool
+odd Zero = False
+odd (Suc n) = even n
+
+\x -> even x || odd x = const True
+
+por el principio de extensionalidad para todo x
+
+(\x -> even x || odd x) x = const True x
+
+const =>  ,,             = const True x
+
+por beta reducción
+
+B (beta) => even x || odd x = True
+
+Por inducción en la estructura de los Nat
+
+EI = Esquema Inductivo = P(Zero) ^ (para todo x . P(x) => P(Suc x)) 
+						 ______                   ____      ______
+					    caso base	               hi	      ti
+
+					    			hipótesis indcutiva    tesis inductiva
+
+p(x) = even x || odd x
+
+caso base : even Zero || od Zero = True
+
+por la primer regla de even => True || odd Zero = True
+
+True || odd Zero = True
+
+por la primer regla del or
+
+True = True
+
+------------------------------------------------------------
+
+paso inductivo: hi => ti
+
+				hi = p(x) = even x || odd x = True
+
+even (Suc x) || odd (Suc x) = True
+
+por segunda regla de even
+
+odd x || odd (Suc x) = True
+
+por la segunda regla del odd
+
+odd x || even x = True
+
+por la conmutatividad del || (or)
+
+even x || odd x = True
+
+pot hipótesis inductiva
+
+True = True
+
+cuadradito de fin
+------------------------------------------------------------
+
+ejercicio de la practica 4
+
+prime x <=> nextDiv 1 x == x
+
+depende de la definición de prime y nextDiv
+
+
+prime :: Int -> Bool
+prime x = sumDivs x == x + 1
+
+sumDivs 0 = 0
+sumDivs 1 = 1
+sumDivs n = 1 - sumDivs' (n-1)
+	where sumDivs' n 0 = 0
+		  sumDivs' n m | mod n m == 0 = nextDiv m n + sumDiv' n (m-1)
+		  			   | otherwise = sumDiv' n (m-1)
+
+nextDiv :: 
+nextDiv y z = if mod y z == 0 
+			  then z
+			  else nextDiv y (z + 1)
+
+
+operacionalmente está bien pero para demostrar es un quilombo
+
+estaría bueno en este caso definir prime asi
+
+data Prime = nextDiv 1 x == x
+
+sale en una línea.
+
+----------------------------------------------------------------------
+
+length (xs ++ ys) = lenght xs + lenght ys
+
+Los predicados son UNARIOS. 
+
+P(xs) = para todo ys tiene que valer la propiedad:
+
+length (xs ++ ys) = lenght xs + lenght ys
+
+Por inducción en la estructura de listas.
+
+estructura inductiva = P([]) ^ (para todo zs. P(zs) => para todo z P(z:zs))
+                       _____                  _____                _______
+                     caso base         hipótesis inductiva     tesis inductiva
+
+caso base: length ([] ++ ys) = lenght [] + lenght ys
+
+por la primer regla del append
+
+length ys = length [] = length + ys
+
+por la primer regla de length
+
+length ys = 0 + length ys
+
+por aritmética
+
+length ys = length ys
+
+cuadradito de fin.
+
+------------------------------------------------------
+
+paso inductivo:  hipótesis inductiva => tesis inductiva
+
+					p(zs) => p (z:zs)
+
+length (z:zs ++ ys) = length (z:zs) + length ys
+
+por la segunda regla de append
+
+length (z:(zs++ys)) = length (z:zs) + length ys
+
+por la segunda regla de length
+
+1 + length (zs ++ ys) = 1 + length zs + length ys
+
+por hipótesis inductiva
+
+TRUE
+
+cuadradito de fin
+
+TERMINÓ EL EJERCICIO
+
+--------------------------------------------------------------
+
+qvq (quiero ver que)
+
+reverse (xs ++ ys) = reverse ys ++ reverse xs
+
+P2(xs) = Para todo ys. reverse (xs ++ ys) = reverse ys ++ reverse xs
+
+por inducción en la estructura de las listas.
+
+Estructura inductiva: P2 ([]) ^ (para todo xs . P2(x) => para todo x . P2(x:xs))
+                      _______                   _____                  ________
+                     caso base            hipotesis inductiva        tesis inductiva
+
+caso base: 
+
+reverse ([] ++ ys) = reverse ys ++ reverse []
+
+por la primer regla del reverse
+
+reverse ([] ++ ys) = reverse ys ++ []
+
+por la primer regla del ++
+
+reverse ys = reverse ys ++ []
+
+por lemma de (++[]) => reverse ys = reverse ys
+
+cuadradito de fin
+
+
+paso inductivo: 
+
+hi => ti
+
+reverse (x:xs ++ ys) = reverse ys ++ reverse (x:xs)
+
+por la segunda regla del ++
+
+reverse (x:(xs++ys)) = reverse ys ++ reverse (x:xs)
+
+por la segunda regla del reverse
+
+reverse (xs++ys) ++ [x] = reverse ys ++ reverse xs ++ [x]
+
+por hipotesis inductiva
+
+reverse ys ++ reverse xs ++ [x] = reverse ys ++ xs ++ [x]
+
+cuadradito final........
+
+----------------------------------------------------------------
+
+reverse (reverse (x:xs) = x:xs)
+
+por la segunda regla del reverse
+
+reverse (reverse xs ++ [x]) = x:xs
+
+por el ejercicio anterior => reverse [x] ++ reverse (reverse xs) = x:xs
+
+
+
+
+
+
+
+
+
+
+
