@@ -1,0 +1,162 @@
+Desafío practica 5
+
+P(xs) = para todo i siendo que 0 <= i < length xs => (reverse xs) !! i = xs !! (length xs -1 -i)
+
+EI = P([]) ^ (para todo xs P(xs) entonces para todo x P(x:xs))
+
+caso base: No existe i tal que 0 <= i < 0
+
+entonces es trivialmente verdadero length []
+
+PI: HI => TI
+
+0 <= i < length (x:xs) => (reverse xs) !! i = xs !! (length xs -1 -i)
+
+separo en 2 casos
+
+1. Cuando el antecedente es falso. En este caso es trivial
+2. Cuando el antecedente es verdadero
+
+resolvemos 2.
+
+reverse xs !! i = xs !! (length xs -1 -i)
+
+por length.2 => reverse xs !! i = xs !! (length xs +1 -1 -i)
+
+por reverse.2 => (reverse xs ++ [x]) !! i = (x:xs) !! (length xs -i)
+
+caso 1 : i = length xs
+
+caso 2: i < length xs
+
+caso 1 => (reverse xs ++ [x]) !! (length xs) = (x:xs) !! (length xs - length xs)
+															________________
+																	0
+
+
+por !!.1 => (reverse xs ++ [x]) !! (length xs) = x
+
+por lema2 => [x] !! (length xs - length (reverse xs)) = x
+
+por lema3 => [x] !! 0 = x
+
+por !!.1 => x = x
+
+TRUE!
+
+caso 2: i < length xs
+
+(reverse xs ++ [x]) !! i = (x:xs) !! (length xs - i)
+
+por lema 2 y 3 => reverse xs !! i = (x:xs) !! (length xs - i)
+
+yo sé que i < length xs entonces
+
+por (!!).2 => reverse xs !! i = xs !! (length xs -i -1)
+
+por HI => TRUE.
+
+TAREA.
+
+lema2: (xs++ys) !! i = if i < length xs then xs !! i else ys !! (i-length xs)
+
+lema3: length xs = length (reverse xs)
+
+------------------------------------------------------------------------------------------------------
+
+data Tree a = Nil | Bin a (Tree a) (Tree a)
+
+leaf :: Tree a -> Bool
+leaf (Bin _ Nil Nil) = True
+leaf _ = False
+
+leaves :: Tree a -> Int
+leaves Nil = 0
+leaves t@(Bin _ l r) | leaf t = 1
+					 | otherwise = leaves l + leaves r
+
+internals :: Tree a -> Int
+internals Nil = 0
+internals t@(Bin _ l r) | leaf t = 0
+						| otherwise = 1 + internals l + internals r
+
+P(t) = leaves t <= internals t + 1
+
+por inducción en la estructura de Tree a
+
+EI = P(Nil) ^ (para todo l, r P(l) ^ P(r) => para todo x P(Bin x l r)
+	 _______                  ____   ____                ____________
+	caso base                  h1     h2					  TI
+							   _________
+							       HI
+
+caso base: leaves Nil <= internals Nil +1
+
+leaves.1 => 0 <= internals Nil + 1
+internals.1 => 0 <= 0 + 1
+
+TRUE
+
+Paso inductivo HI: P(l)
+				   P(r) => TI : P(Bin x l r)
+
+leaves (Bin x l r) <= internals (Bin x l r) + 1
+
+caso 1: leaf (Bin x l r) = True
+
+por leaves 2. => 1 <= internals (Bin x l r) + 1
+por internals 2. => 1 <= 0 + 1
+
+TRUE
+
+caso 2: leaf (Bin x l r) = False
+
+leave.2 => leaves l + leaves r <= internals (Bin x l r) + 1
+internals.2 => leaves l + leaves r <= internals l + 1 + internals r + 1   
+				_______   ________    _______________   ________________
+				  hi1        h2            hi1                hi2
+HI1,2, arit => True
+
+inOrder :: Tree a -> [a]
+inOrder Nil = []
+inOrder (Bin x l r) = inOrder l ++ [x] ++ inOrder r
+
+mirror :: Tree a -> Tree a
+mirror Nil = Nil
+mirror (Bin x l r) = Bin x (mirror r) (mirror l)
+
+P(t) = reverse (inOrder t) = inOrder (mirror t)
+
+por inducción en la estr de Tree a
+
+EI = P(Nil) ^ (para todo l,r P(l) ^ P(r) => para todo x P(Bin x l r))
+
+caso base: reverse (inOrder Nil) = inOrder (mirror Nil)
+
+por mirror.1 => reverse (inOrder Nil) = inOrder Nil
+por inOrder.1 => reverse [] = []
+por reverse .1 => [] = []
+
+TRUE
+
+Paso inductivo: HI: P(l) y P(r)
+				TI: P(Bin x l r)
+
+reverse (inOrder (Bin x l r)) = inOrder (mirror (Bin x l r))
+
+por mirror.2 => reverse (inOrder (Bin x l r)) = inOrder (Bin x (mirror r) (mirror l))
+por inOrder.2 => reverse (inOrder l ++ [x] ++ inOrder r) = inOrder (mirror r) ++ [x] ++ inOrder (mirror l)
+lema de la clase pasada de reverse => reverse (x: inOrder r) ++ reverse (inOrder l) = inOrder (mirror r) ++ [x] ++ inOrder (mirror l)
+por reverse. 2 => reverse (inOrder r) ++ [x] ++ reverse (inOrder l) = inOrder (mirror r) ++ [x] ++ inOrder (mirror l)
+				  ___________________ 			___________________   __________________           __________________
+				  		HI.2						   HI.1					HI.2						HI.1
+por HI1,2 => inOrder (mirror r) ++ [x] ++ inOrder (mirror l)
+
+TRUE
+
+** SE APLICO LA HIPOTESIS DE UN SOLO LADO **
+
+MIRAR TAREA Y DESAFIO!
+
+TAREA LINEA 59
+
