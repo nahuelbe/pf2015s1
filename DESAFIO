@@ -1,1 +1,0 @@
-type Fuzzyset a = a -> Float [0, 1] 

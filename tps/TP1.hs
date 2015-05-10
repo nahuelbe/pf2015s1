@@ -78,3 +78,28 @@ f' x = let e y = (x,x)
 greaterThan :: (Integer,Integer) -> Bool
 greaterThan (x,y) | x > y = True
 				  | otherwise = False
+
+sort3 :: (Integer, Integer, Integer) -> (Integer, Integer, Integer)
+sort3 t = addFirstTo3Tuple (getMax t) (sort2 (removeMax t))
+
+getMax :: (Integer, Integer, Integer) -> Integer
+getMax (x,y,z) = if x > y && x > z
+				 then x
+				 else if y > x && y > z
+				 	  then y
+				 	  else z
+
+removeMax :: (Integer, Integer, Integer) -> (Integer, Integer)
+removeMax (x,y,z) = if x > y && x > z
+					then (y,z)
+					else if y > x && y > z
+						 then (x,z)
+						 else (x,y)
+
+sort2 :: (Integer, Integer) -> (Integer, Integer)
+sort2 (x,y) = if x > y
+			  then (x,y)
+			  else (y,x)
+
+addFirstTo3Tuple :: Integer -> (Integer, Integer) -> (Integer, Integer, Integer)
+addFirstTo3Tuple x (y,z) = (x,y,z)
