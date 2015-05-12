@@ -1,0 +1,99 @@
+foldr :: (a -> b -> b) -> b -> [a] -> b
+foldr f cb [] = cb
+foldr f cb (x:xs) = f x (foldr f cb xs)
+
+sum :: [Int] -> Int
+sum = foldr (+) 0
+
+map :: (a -> b) -> [a] -> [b]
+map f [] = []
+map f (x:xs) = f x : map f xs
+
+map :: (a -> b) -> [a] -> [b]
+map f = foldr (\x r -> f x : r) []
+
+filter :: (a -> Bool) -> [a] -> [a]
+filter p xs = foldr (\x r -> if p x then x:r else r) [] xs // SE PUEDE BORRAR EL XS
+
+concatMap :: (a -> [b]) -> [a] -> [b]
+concatMap 
+concatMap f = concat . (map f)
+
+concat :: [[a]] -> [a]
+concat xss = foldr (\xs rs -> xs ++ rs) [] xss
+
+concat = foldr (++) [] // POSIBLE SOLUCION
+
+all :: (a -> Bool) -> [a] -> Bool
+all f = foldr (\x r -> f x && r) True
+
+all f = foldr ((&&) . f) True //opcional
+
+all' f xs = and (map f xs)
+
+and :: [Bool] -> Bool
+and = foldr (&&) True
+
+and' = all id
+
+zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
+zipWith f [] _ = []
+zipWith f _ [] = []
+zipWith f (x:xs) (y:ys) = f x y : zipWith f xs ys
+
+zip :: [a] -> [b] -> [(a,b)]
+zip = zipWith (\x y -> (x,y))
+zip =      	zipWith (,) // OPCION ALTERNATIVA
+
+index :: [a] -> [(Int, a)]
+index = zip [1..]
+
+qvq . sum (xs ++ ys) = sum (zipWith (+) xs ys)
+
+Por induccion en la estr de [a]
+
+P(xs) = para todo ys . sum(xs ++ ys) = sum (zipWith (+) xs ys)
+
+EI : P([]) ^ (para todo xs . P(xs) => para todo x. P(x:xs))
+	  ___                    ____                  _______
+   caso base				  hi 					  ti
+
+. Caso Base : P([])
+			   sum([] ++ ys) = sum (zipWith (+) [] ys)
+
+			(++).1 => sum ys = sum (zipWith (+) [] ys)
+			zipWith.1 => sum ys = sum []
+
+					FRUTA, no me convencí de la propiedad.
+
+-----------------------------------------------------------
+-----------------------------------------------------------
+
+type Matrix a = [[a]]
+
+repOk :: Matrix a -> Bool
+repOk (f:fs) = foldr (\row r -> length row == length f && r) True fs
+
+mGet :: Matrix a -> Int -> Int -> a
+mGet m i j = (m !! i) !! j
+
+mulScaler :: Int -> Matrix Int -> Matrix Int
+mulScaler k m = map (\row -> map (k*) row) m
+
+mulScaler k = map (map (k*)) // OPCIONAL
+
+mAdd :: Matrix Int -> Matrix Int -> Matrix Int //PREC = Las 2 matrix tienen la misma cantidad de elementos
+mAdd m n = zipWith (\fm fn -> zipWith (+) fm fn) m n
+
+mAdd = zipWith (zipWith (+)) //Opcional
+
+mAdd = (zipWith . zipWith) (+) //Opcional
+
+mAdd =	 twice zipWith (+) //Opcional
+
+mAll :: (a -> Bool) -> Matrix a -> Bool
+mAll p m = foldr (\row r -> all row && r) True m
+
+maAll  = twice all -> MAGIA PURA
+ 	   = and . map (all p)
+	   = all p . concat
