@@ -1,0 +1,44 @@
+data Tree a = Nil | Bin a (Tree a) (Tree a)
+
+mapTree :: (a -> b) -> Tree a -> Tree b
+mapTree f Nil = Nil
+mapTree f (Bin x l r) = Bin (f x) (mapTree f l) (mapTree f r)
+
+foldTree :: (a -> b -> b -> b) -> b -> Tree a -> b
+foldTree f cb Nil = cb
+foldTree f cb (Bin x l r) = f x (foldTree f cb l) (foldTree f cb r)
+
+sizeTree :: Tree a -> Int
+sizeTree = foldTree (\x lr rr -> 1 + ll + rr) 0
+
+heightTree :: Tree a -> Int
+heightTree = foldTree (\x lr rr -> 1 + max lr rr) 0
+
+mapTree' :: (a -> b) -> Tree a -> Tree b
+mapTree' f = foldTree (\x lr rr -> Bin (f x) lr rr) Nil
+
+inOrder :: Tree a -> [a]
+inOrder = foldTree (\x lr rr -> lr ++ [x] ++ rr) []
+
+search :: Ord a => a -> Tree a -> Bool
+search y = foldTree (\x lr rr -> x == y || if y < x then lr else rr) False
+
+data Poli = Cte Int | Var | Add Poli Poli | Mul Poli Poli
+
+foldPoli :: (Int -> b) -> b -> (b -> b -> b) -> (b -> b -> b) -> Poli -> b
+foldPoli fc fv fa fm (Cte n) = fc n
+foldPoli fc fv fa fm (Var) = fv
+foldPoli fc fv fa fm (Add p q) = fa (foldPoli fc fv fa fm p) (foldPoli fc fv fa fm q)
+foldPoli fc fv fa fm (Mul p q) = fm (foldPoli fc fv fa fm p) (foldPoli fc fv fa fm q)
+
+eval :: Int -> Poli -> Int
+eval x = foldPoli id x (+) (*)
+
+data PrefixTree a = Nil | Node a (PrefixTree a) (PrefixTree a) (PrefixTree a)
+
+foldPrefixTree :: b -> (a -> b -> b -> b -> b) -> PrefixTree a -> b
+foldPrefixTree cb f Nil = cb
+foldPrefixTree cb f (Node x l c r) = f x (foldPrefixTree cb f l) (foldPrefixTree cb f c) (foldPrefixTree cb f r)
+
+flatten :: Ord a => PrefixTree a -> [[a]]
+flatten = foldPrefixTree [] (\x lr cr rr -> [[x]] ++ map (x:) cr ++ lr ++ rr)
