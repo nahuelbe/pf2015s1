@@ -1,0 +1,66 @@
+longest :: Tree a -> Int
+longest = fst $ foldTree (\ _ (llp, lb)(rlp, rb) -> (llp ´max´ rlp ´max´ lb + 1 + max lb rb)) (0,0)
+
+Resolución de parcial
+
+data Comp = Silencio Dur |
+			Batido Nota Dur |
+			Arpegio Comp Comp |
+			Acorde Comp Comp
+
+alargar :: Int -> Comp -> Comp
+alargar k (Silencio d) = Silencio k
+alargar k (Batido n d) = Batido n k
+alargar k (Arpegio ci cd) = Arpegio (alargar k ci) (alargar k cd)
+alargar k (Acorde ci cd) = Acorde (alargar k ci) (alargar k cd)
+
+duracion :: Comp -> Dur
+duracion (Silencio d) =  d
+duracion (Batido n d) = d
+duracion (Acorde c1 c2) = duracion c1 ´max´ duracion c2
+duracion (Arpegio c1 c2) = duracion c1 + duracion c2
+
+type Midi = [[Nota]]
+
+replicate :: Int -> a -> [a]
+replicate 0 _ = []
+replicate n e = e : replicate (n - 1) e
+
+sintetizar :: Comp -> Midi
+sintetizar (Silencio d) = []
+sintetizar (Batido n d) = replicate d [n]
+sintetizar (Arpegio c1 c2) = sintetizar c1 ++ sintetizar c2
+sintetizar (Acorde c1 c2) = let (s1,s2) = (sintetizar c1, sintetizar c2)
+								(d1,d2) = (length s1, length s2)
+								cola = if d1 > d2 then drop d2 s1 else drop d1 s2
+							in (zipWith (++) s1 s2 ++ cola)
+
+foldComp :: (Dur -> b) -> (Nota -> Dur -> b) -> (b -> b -> b) -> (b -> b -> b) -> Comp -> b
+foldComp fs fb far fac (Silencio d) = fs d
+foldComp fs fb far fac (Batido n d) = fb n d
+foldComp fs fb far fac (Arpegio c1 c2) = far (foldComp fs fb far fac c1) (foldComp fs fb far fac c2)
+foldComp fs fb far fac (Acorde c1 c2) = fac (foldComp fs fb far fac c1) (foldComp fs fb far fac c2)
+
+Redefinir las funciones del punto 1 con fold
+
+alargar' k = foldComp (\d -> Silencio d*k) (\n d-> Batido n (d*k)) Arpegio Acorde
+
+duracion' = foldComp id (\_ d -> d) (+) max
+
+sintetizar' = foldComp (const []) (\n d -> replicate d [n]) (\s1 s2 -> let (d1, d2) = (length s1, length s2)
+																	       cola = if d1 > d2 then drop d2 s1 else drop d1 s2
+																	   in (zipWith (++) s1 s2 ++ cola))
+
+silencios :: Comp -> [Tiempo]
+silencios c = let midi = sintetizar c
+			  	midiIndexado = index midi
+			  	midiFiltrado = filter (\(i,ns) -> (null ns)) midiIndexado
+			  in map fst midiFiltado
+
+unir :: [Comp] -> [Comp] -> Comp
+unir cs es = let acordes = zipWith Acorde cs es
+			 in foldr (\c r -> Arpegio c r) (Silencio 0) acordes
+
+samplear :: Comp -> Sampler
+saplear c = let midi = sintetizar c
+			in (\t -> midi !! ((t-1) ´length´ midi))					
