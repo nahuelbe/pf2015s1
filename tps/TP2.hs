@@ -67,6 +67,23 @@ f) (1 < x < 2)
 
 está bien formada pero x no está definido
 
+11. 
+
+a) \x y z -> if x<=y && x <= z then x else if y <= x && y <= z then y else z
+
+b) \x y -> y
+
+c) \x y -> y && x 
+
+12.
+
+a) iff :: Bool -> Bool -> Bool
+   iff x y = if x then not y
+   			 else y
+
+b) alpha :: a -> b -> b
+   alpha x y = y
+
 -}
 
 data ColorPrimario = Rojo | Azul | Amarillo deriving (Show)
@@ -77,3 +94,6 @@ mezclar Rojo Rojo = error "No se puede mezclar el mismo color"
 mezclar Amarillo Amarillo = error "No se puede mezclar el mismo color"
 mezclar Azul Azul = error "No se puede mezclar el mismo color"
 mezclar c1 c2 = Compuesto c1 c2
+
+
+
