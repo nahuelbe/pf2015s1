@@ -1,0 +1,104 @@
+class Package f where
+
+handle :: (a -> b) -> f a -> f b
+
+instance Package Maybe where
+
+	handle f Nothing = Nothingst
+	handle f (Just x) = Just (f x)
+
+instance Package [] where 
+	handle = map
+
+instance Package ( (->) c ) where
+	handle f g = \c -> f (g c)
+
+	otra versión
+
+	handle = (.)
+
+--------------------------------------
+
+class Package m => Box m where
+	unite :: m (m a) -> m a
+	pack :: a -> m a
+
+instance Box Maybe where
+
+	unite Nothing = Nothing
+	unite (Just x) = x
+
+	pack = Just
+
+instance Box [] where
+	unite = concat
+	pack x = [x]
+
+instance Box ((->) c) where
+	unite b = \c -> b c c
+	pack x = \c -> x ====> const
+
+------------------------------------------
+
+link :: Box m => (a -> b) -> m a -> m b
+link f box = unite (handle f box)
+
+handle' :: Box m => (a -> b) -> m a -> m b
+handle' f = link (pack . f)
+
+unite' :: Box m => m (m a) -> m a
+unite' = link.id
+
+employ :: Box m => m (a -> b) -> m a -> m b
+employ fs box = link (\g -> handl'e g box) fs
+
+---------------------------------------------
+
+
+class Monad m where
+
+	(>>=) :: ...  <= Bind
+	return :: ... <= 
+
+	handle = liftM
+	unite = join
+	employ = ap
+
+--------------------------------------------
+
+pred3 x = do  n <- pred x
+			  m <- pred n
+			  o <- pred m
+			  return o
+		    where pred Z = Nothing
+		    	pred (S p) = Just p
+
+class Monad m where
+	(>>=) :: m a -> (a -> m b) -> m b
+	return :: a -> m a
+
+pred3 x = pred x >>= \n ->
+		  pred n >>= \m ->
+		  pred m >>= \o ->
+		  return o
+
+instance Monad [] where
+	xs >>= f = concatMap f xs
+	return x = [x]
+
+suffixes :: [Int] -> [[Int]]
+suffixes [] = []
+suffixes (x:xs) = (x:xs) : suffixes xs
+
+guard :: Bool -> [()]
+guard True = [()]
+guard False = []
+
+
+----------------------------------------------
+
+subsetsum :: [Int] -> Int -> [[Int]]
+subsetsum xs k = if k == 0 then return []
+				 else do
+				 	  (x:xs') <- suffixes xs
+				 	  ys <- subsetsum xs' (k-x)
