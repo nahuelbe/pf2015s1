@@ -101,4 +101,15 @@ subsetsum :: [Int] -> Int -> [[Int]]
 subsetsum xs k = if k == 0 then return []
 				 else do
 				 	  (x:xs') <- suffixes xs
+				 	  guard (x <= k)
 				 	  ys <- subsetsum xs' (k-x)
+				 	  return (x:ys)
+
+
+				usando Bind
+
+				else 
+					suffixes xs >>= \(x:xs') ->
+					guard (x <= k) >>= \() ->
+					subsetsum xs' (k-x) >>= \ys ->
+					return (x:ys)
